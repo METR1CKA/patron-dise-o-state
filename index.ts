@@ -8,15 +8,11 @@
  */
 
 /**
- * Definimos una interfaz para el estado
+ * Definimos una interfaz o tipo para el estado
  */
 interface ReplacementState {
   approve(replacement: Replacement, approved: boolean): void
 }
-
-/* type ReplacementState = {
-  approve(replacement: Replacement, approved: boolean): void
-} */
 
 /**
  * Definimos una clase para el reemplazo
@@ -51,14 +47,14 @@ class Design implements ReplacementState {
   public approve(replacement: Replacement, approved: boolean): void {
     replacement.approved = approved
 
-    if (approved) {
-      replacement.setState = new Review()
-      console.log('\n[+] Diseño aprobado:', replacement)
+    if (!approved) {
+      console.error('\n[!] Diseño no aprobado, estado actual:', replacement)
+      return
     }
 
-    if (!approved) {
-      console.error('\n[!] Diseño no aprobado, regresando al estado inicial:', replacement)
-    }
+    replacement.setState = new Review()
+
+    console.log('\n[+] Diseño aprobado, estado actual:', replacement)
   }
 }
 
@@ -69,15 +65,14 @@ class Review implements ReplacementState {
   public approve(replacement: Replacement, approved: boolean): void {
     replacement.approved = approved
 
-    if (approved) {
-      replacement.setState = new Construction()
-      console.log('\n[+] Review aprobado:', replacement)
+    if (!approved) {
+      console.error('\n[!] Review no aprobado, estado actual:', replacement)
+      return
     }
 
-    if (!approved) {
-      replacement.setState = new Design()
-      console.error('\n[!] Review no aprobado, regresando a Design:', replacement)
-    }
+    replacement.setState = new Construction()
+
+    console.log('\n[+] Review aprobado, estado actual:', replacement)
   }
 }
 
@@ -88,15 +83,14 @@ class Construction implements ReplacementState {
   public approve(replacement: Replacement, approved: boolean): void {
     replacement.approved = approved
 
-    if (approved) {
-      replacement.setState = new Finished()
-      console.log('\n[+] Construction aprobado:', replacement)
+    if (!approved) {
+      console.error('\n[!] Construction no aprobado, estado actual:', replacement)
+      return
     }
 
-    if (!approved) {
-      replacement.setState = new Review()
-      console.error('\n[!] Construction no aprobado, regresando a Review:', replacement)
-    }
+    replacement.setState = new Finished()
+
+    console.log('\n[+] Construction aprobado, estado actual:', replacement)
   }
 }
 
@@ -107,19 +101,19 @@ class Finished implements ReplacementState {
   public approve(replacement: Replacement, approved: boolean): void {
     replacement.approved = approved
 
-    if (approved) {
-      console.log('\n[+] Repuesto terminado')
+    if (!approved) {
+      console.error('\n[!] Finished no aprobado, estado actual:', replacement)
+      return
     }
 
-    if (!approved) {
-      replacement.setState = new Construction()
-      console.error('\n[!] Finished no aprobado, regresando a Construction:', replacement)
-    }
+    replacement.setState = new Finished()
+
+    console.log('\n[+] Repuesto terminado')
   }
 }
 
 /**
- * Creamos un nuevo reemplazo y lo aprobamos
+ * Creamos un nuevo repuesto y lo aprobamos
  */
 
 // - Estado inicial
@@ -132,7 +126,7 @@ replacement.approve(true)
 replacement.approve(true)
 
 // - Aprobamos la construcción
-replacement.approve(false)
+replacement.approve(true)
 
 // - Aprobamos el finished
 replacement.approve(true)
